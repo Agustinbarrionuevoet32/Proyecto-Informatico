@@ -1,0 +1,262 @@
+#define TMP   A4
+#define BUZZ  9
+#define BUZZ2 10
+#define LED_R 3
+#define LED_G 6
+#define LED_B 5
+
+
+
+#define NOTE_B0  31
+#define NOTE_C1  33
+#define NOTE_CS1 35
+#define NOTE_D1  37
+#define NOTE_DS1 39
+#define NOTE_E1  41
+#define NOTE_F1  44
+#define NOTE_FS1 46
+#define NOTE_G1  49
+#define NOTE_GS1 52
+#define NOTE_A1  55
+#define NOTE_AS1 58
+#define NOTE_B1  62
+#define NOTE_C2  65
+#define NOTE_CS2 69
+#define NOTE_D2  73
+#define NOTE_DS2 78
+#define NOTE_E2  82
+#define NOTE_F2  87
+#define NOTE_FS2 93
+#define NOTE_G2  98
+#define NOTE_GS2 104
+#define NOTE_A2  110
+#define NOTE_AS2 117
+#define NOTE_B2  123
+#define NOTE_C3  131
+#define NOTE_CS3 139
+#define NOTE_D3  147
+#define NOTE_DS3 156
+#define NOTE_E3  165
+#define NOTE_F3  175
+#define NOTE_FS3 185
+#define NOTE_G3  196
+#define NOTE_GS3 208
+#define NOTE_A3  220
+#define NOTE_AS3 233
+#define NOTE_B3  247
+#define NOTE_C4  262
+#define NOTE_CS4 277
+#define NOTE_D4  294
+#define NOTE_DS4 311
+#define NOTE_E4  330
+#define NOTE_F4  349
+#define NOTE_FS4 370
+#define NOTE_G4  392
+#define NOTE_GS4 415
+#define NOTE_A4  440
+#define NOTE_AS4 466
+#define NOTE_B4  494
+#define NOTE_C5  523
+#define NOTE_CS5 554
+#define NOTE_D5  587
+#define NOTE_DS5 622
+#define NOTE_E5  659
+#define NOTE_F5  698
+#define NOTE_FS5 740
+#define NOTE_G5  784
+#define NOTE_GS5 831
+#define NOTE_A5  880
+#define NOTE_AS5 932
+#define NOTE_B5  988
+#define NOTE_C6  1047
+#define NOTE_CS6 1109
+#define NOTE_D6  1175
+#define NOTE_DS6 1245
+#define NOTE_E6  1319
+#define NOTE_F6  1397
+#define NOTE_FS6 1480
+#define NOTE_G6  1568
+#define NOTE_GS6 1661
+#define NOTE_A6  1760
+#define NOTE_AS6 1865
+#define NOTE_B6  1976
+#define NOTE_C7  2093
+#define NOTE_CS7 2217
+#define NOTE_D7  2349
+#define NOTE_DS7 2489
+#define NOTE_E7  2637
+#define NOTE_F7  2794
+#define NOTE_FS7 2960
+#define NOTE_G7  3136
+#define NOTE_GS7 3322
+#define NOTE_A7  3520
+#define NOTE_AS7 3729
+#define NOTE_B7  3951
+#define NOTE_C8  4186
+#define NOTE_CS8 4435
+#define NOTE_D8  4699
+#define NOTE_DS8 4978
+#define REST 0
+
+#define lenght(vec,tipo) sizeof(vec)/sizeof(tipo)
+
+int melodia[] = {
+  REST,2, REST,4, REST,8, NOTE_DS4,8,
+  NOTE_E4,-4, REST,8, NOTE_FS4,8, NOTE_G4,-4, REST,8, NOTE_DS4,8,
+  NOTE_E4,-8, NOTE_FS4,8,  NOTE_G4,-8, NOTE_C5,8, NOTE_B4,-8, NOTE_E4,8, NOTE_G4,-8, NOTE_B4,8,  
+  NOTE_AS4,2, NOTE_A4,-16, NOTE_G4,-16, NOTE_E4,-16, NOTE_D4,-16,
+  NOTE_E4,2, REST,4, REST,8, NOTE_DS4,4,
+
+  NOTE_E4,-4, REST,8, NOTE_FS4,8, NOTE_G4,-4, REST,8, NOTE_DS4,8,
+  NOTE_E4,-8, NOTE_FS4,8,  NOTE_G4,-8, NOTE_C5,8, NOTE_B4,-8, NOTE_G4,8, NOTE_B4,-8, NOTE_E5,8,
+  NOTE_DS5,1,  
+  NOTE_D5,2, REST,4, REST,8, NOTE_DS4,8,
+  NOTE_E4,-4, REST,8, NOTE_FS4,8, NOTE_G4,-4, REST,8, NOTE_DS4,8,
+  NOTE_E4,-8, NOTE_FS4,8,  NOTE_G4,-8, NOTE_C5,8, NOTE_B4,-8, NOTE_E4,8, NOTE_G4,-8, NOTE_B4,8,  
+ 
+  NOTE_AS4,2, NOTE_A4,-16, NOTE_G4,-16, NOTE_E4,-16, NOTE_D4,-16,
+  NOTE_E4,-4, REST,4,
+  REST,4, NOTE_E5,-8, NOTE_D5,8, NOTE_B4,-8, NOTE_A4,8, NOTE_G4,-8, NOTE_E4,-8,
+  NOTE_AS4,16, NOTE_A4,-8, NOTE_AS4,16, NOTE_A4,-8, NOTE_AS4,16, NOTE_A4,-8, NOTE_AS4,16, NOTE_A4,-8,  
+  NOTE_G4,-16, NOTE_E4,-16, NOTE_D4,-16, NOTE_E4,16, NOTE_E4,16, NOTE_E4,2,
+};
+
+
+int pines[]  = { BUZZ , BUZZ2 , LED_R , LED_G , LED_B ,  TMP};
+int estado[] = {   1  ,   1   ,   1   ,   1   ,  1   ,   0 };
+
+int tempo = 90;//80~150
+int notes  =  sizeof(melodia) / sizeof( melodia[0] ) / 2;
+int wholenote = (60000 * 4) / tempo;
+int thisnote , divider , noteDuration = 0;
+unsigned long timerMelodia = 0;
+int mod = 1.5; //1.1~1.9
+
+int num[] = {5,2,7,9};
+int aux[] = {10,15,13,17};
+
+void setup()
+{
+   for(int i=0;i<lenght(pines,int);i++)
+  {
+      pinMode(pines[i] , estado[i]);
+  }
+  Serial.begin(9600);
+  randomSeed( analogRead(A0) );
+ 
+  Serial.println(  convertirTemp( obtenerTemp(), 'p' )  );
+  Serial.println( vectorAleatorio()[0] );
+ 
+  vaciarVec( num , lenght(num,int) );
+}
+
+//procedimiento
+void loop()
+{
+    parpadeo( 1 , 0 , 0 , 1000);
+      parpadeo( 0 , 0 , 1 , 500.0);
+    //tocarCancion(BUZZ);
+}
+
+//funciones y procedimientos personalizados
+//sobrecarga de metodos/funciones
+void parpadeo( int r,int g,int b, double t)
+{
+}
+
+void parpadeo( int r,int g,int b, int t ) //parametros
+{
+  //validaciones
+  if((r >1 || r <0) || (g >1 || g <0) || (b >1 || b<0) )
+   return;
+   
+  digitalWrite(LED_R,r);
+  digitalWrite(LED_G,g);
+  digitalWrite(LED_B,b);
+   delay( t );
+  digitalWrite(LED_R,LOW);
+  digitalWrite(LED_G,LOW);
+  digitalWrite(LED_B,LOW);
+   delay( t );
+}
+
+
+//funcion
+float obtenerTemp()
+{
+  float temp = (analogRead(TMP) * 5.0 /1024) *100 -50;
+ 
+  return temp;
+  //return (analogRead(TMP) * 5.0 /1024) *100 -50;
+}
+
+float convertirTemp(float t, char opt)
+{
+  float temp=0;
+  switch(opt)
+  {
+    case 'f':
+        temp = (t * (9/5)) + 32;
+    break;
+    case 'k':
+        temp = t + 237.0;
+    break;
+    default:
+        temp = t;
+  }
+  return temp;
+}
+
+int* vectorAleatorio()
+{
+  int* vec = new int[10]; //bien rustica aca
+  for(int i = 0 ; i < lenght(vec,int)  ;i++){
+    vec[i] = random(0,5+1);
+  }
+  return vec;        
+}
+
+void vaciarVec( int* v , int size)
+{
+  for(int i =0 ; i < size ; i++)
+  {
+    v[i] = 0;
+  }
+}
+
+void vaciarVec()
+{
+  for(int i =0 ; i < lenght(aux,int) ; i++)
+  {
+    aux[i] = 0;
+  }  
+}
+
+
+//procedimiento
+void tocarCancion(int b)
+{
+  if( thisnote < notes * 2)
+  {
+    if(millis() - timerMelodia >= noteDuration )
+    {
+      timerMelodia = millis();
+      noTone(b);
+     
+      divider = melodia[thisnote+1];
+     
+      if(divider > 0){
+        //duracin normal de una nota
+          noteDuration = wholenote / divider ;
+      }else if(divider < 0){
+        //incremento TEMPORAL de una nota
+          noteDuration = wholenote / abs(divider) ;
+        noteDuration *= mod;
+      }
+      tone(b , melodia[thisnote] , noteDuration *0.9 );
+      thisnote = thisnote + 2;
+    }
+  } else {
+    noTone(b);
+  }
+}
